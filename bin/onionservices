@@ -1,0 +1,55 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+import os
+import shutil
+import sys
+import time
+import tempfile
+
+from stem.control import Controller
+
+priv_key_dir = os.path.expanduser('~/.config/onionservices/')
+if not os.path.exists(priv_key_dir):
+  os.makedirs(priv_key_dir)
+
+priv_key_path = priv_key_dir + 'priv.key'
+bind_port = {80: 3000}
+
+print(' * Connecting to tor')
+
+with Controller.from_port(port=9051) as controller:
+  controller.authenticate()
+
+  result = None
+
+  if not os.path.exists(priv_key_path):
+    result = controller.create_ephemeral_hidden_service(
+        bind_port, await_publication=True)
+    print(" * Started a new onion hidden service")
+    with open(priv_key_path, 'w') as key_file:
+      key_file.write('%s:%s' % (result.private_key_type, result.private_key))
+  else:
+    with open(priv_key_path) as key_file:
+      key_type, key_content = key_file.read().split(':', 1)
+    print(" * Resuming ephemeral service from saved private key...")
+    result = controller.create_ephemeral_hidden_service(
+          bind_port, await_publication=True, key_type=key_type, key_content=key_content)
+
+  if result and result.service_id:
+    print(" * Our service is available at %s.onion, press ctrl+c to quit" %
+          result.service_id)
+  else:
+    print(" * Unable to determine our service's hostname, probably due to being unable to read the hidden service directory")
+
+# Shut down the hidden service and clean it off disk. Note that you *don't*
+# want to delete the hidden service directory if you'd like to have this
+# same *.onion address in the future.
+
+  while True:
+    try:
+      time.sleep(5)
+    except KeyboardInterrupt:
+      print(" * Shutting down our hidden service")
+      controller.remove_ephemeral_hidden_service(result.service_id)
+   #   shutil.rmtree(hidden_service_dir)
+      sys.exit(0)

@@ -1,0 +1,25 @@
+---
+- apparmor-profiles:
+    - '/usr/bin/onionservices'
+  users:
+    - 'amnesia'
+  commands:
+    GETINFO:
+      - 'version'
+      - 'onions/current'
+    ADD_ONION:
+      - 'NEW:(BEST|RSA1024) Port=80,3000'
+      - '(ED25519-V3|RSA1024):(\S+) Port=80,3000'
+    DEL_ONION:
+      - '.+'
+    GETCONF:
+      - 'hiddenservicesinglehopmode'
+  confs:
+    __owningcontrollerprocess:
+  events:
+    SIGNAL:
+      suppress: true
+    CONF_CHANGED:
+      suppress: true
+    HS_DESC:
+    STATUS_SERVER:

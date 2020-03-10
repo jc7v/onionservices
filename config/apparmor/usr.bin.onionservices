@@ -1,0 +1,10 @@
+#include <tunables/global>
+
+/usr/bin/onionservices {
+  #include <abstractions/onionservices>
+
+  /usr/bin/ r,
+  /usr/bin/onionservices r,
+
+  #include <local/usr.bin.onionservices>
+}
