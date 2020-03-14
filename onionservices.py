@@ -79,10 +79,10 @@ class OnionServices:
 
   # Return the name of the private key of the service
   def get_private_key_name(self):
-    return self.private_key_name
+    return str(self.private_key_name)
 
   def get_private_key_path(self):
-    return str(self.get_config_key_directory().joinpath(str(self.get_private_key_name())))
+    return str(self.get_config_key_directory().joinpath(self.get_private_key_name()))
 
   # The directory where we can read and write the private key
   def get_config_key_directory(self):
