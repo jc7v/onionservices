@@ -8,11 +8,15 @@ import optparse
 from stem.control import Controller
 from onionservices import OnionServices
 
+
 def main():
   p = optparse.OptionParser()
-  p.add_option('--internal-port', '-i', default='3000', dest='internal_port', help='The port  of the service running locally you want to publish as hidden service', type='int', metavar='PORT', action='store')
-  p.add_option('--external-port', '-e', default='80', dest='external_port', help='The port of the .onion adress', metavar='PORT', action='store', type='int')
-  p.add_option('--private-key', '-p', dest='private_key', metavar='NAME', action='store', type='string', help='the private key name from which we can resume the service. If the key does not exist, the private key will be saved under the specified name')
+  p.add_option('--internal-port', '-i', default='3000', dest='internal_port',
+               help='The port  of the service running locally you want to publish as hidden service', type='int', metavar='PORT', action='store')
+  p.add_option('--external-port', '-e', default='80', dest='external_port',
+               help='The port of the .onion adress', metavar='PORT', action='store', type='int')
+  p.add_option('--private-key', '-p', dest='private_key', metavar='NAME', action='store', type='string',
+               help='the private key name from which we can resume the service. If the key does not exist, the private key will be saved under the specified name')
   options, arguments = p.parse_args()
   bind_port = {int(options.external_port): int(options.internal_port)}
   onion_service = OnionServices(bind_port, options.private_key)
@@ -37,9 +41,10 @@ def main():
       if not onion_service.has_existed():
         if options.private_key or str(input("Do you want to persist the private key of the onion hidden service to disk? (yes/no)")) == 'yes':
           onion_service.persist()
-          print(" * Private key saved at: " + onion_service.get_private_key_path())
+          print(" * Private key saved at: " +
+                onion_service.get_private_key_path())
       onion_service.stop()
       sys.exit(0)
 
 
-main() 
+main()
